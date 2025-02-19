@@ -1,15 +1,22 @@
 import pandas as pd
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv() 
 
 # api url
 url = 'https://www.alphavantage.co/query'
+
+api_key = os.environ.get('ALPHAVANTAGE_KEY')
+print(api_key)
 
 # api parameters
 params = {
     "function": "TIME_SERIES_DAILY",
     "symbol": "AAPL",
     "datatype": "json",
-    "apikey": "U0S1NNAA7C7EZ6B8"
+    "apikey": api_key
 }
 try:
     # send api request
@@ -27,15 +34,12 @@ try:
     trimmed_data = data["Time Series (Daily)"]
 
     # convert to pandas dataframe
-    df = pd.DataFrame(trimmed_data)
+    df = pd.DataFrame.from_dict(trimmed_data, orient='index')
 
     columns = ['1. open', '2. high', '3. low', '4. close', '5. volume']
-    for col in df:
+    for col in df.columns:
         if col not in columns:
             print(f"Warning, missing column: {col}")
-        
-    # transpose data for viewing
-    df = df.transpose()
 
     # print last 10 rows
     print(df.tail(10))
